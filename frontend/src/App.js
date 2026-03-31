@@ -3,7 +3,8 @@ import Chart from "./components/Chart";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-const API = "http://localhost:5000/api/transactions";
+const API = "https://expense-tracker-application-u7lo.onrender.com/api/transactions";
+
 
 function App() {
   const [transactions, setTransactions] = useState([]);
