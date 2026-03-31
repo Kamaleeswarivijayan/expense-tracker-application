@@ -1,23 +1,28 @@
-const express = require("express");
-const cors = require("cors");
-require("./config/db");
 require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// ROUTES
+const transactionRoutes = require("./routes/transactionRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/auth", authRoutes);
+
+// ✅ CONNECT DATABASE (PUT HERE)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
+
+// ✅ START SERVER (SEPARATE LINE)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-const app = express();
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
-app.use(cors());
-app.use(express.json());
-
-const routes = require("./routes/transactionRoutes");
-app.use("/api/transactions", routes);
-
-app.get("/", (req, res) => {
-  res.send("Expense Tracker API Running 🚀");
-});
-
-app.listen(5000, () => console.log("Server running on port 5000"))mongoose.connect(process.env.MONGO_URI);
