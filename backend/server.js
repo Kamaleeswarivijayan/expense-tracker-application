@@ -14,7 +14,9 @@ const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/auth", authRoutes);
-
+app.get("/", (req, res) => {
+  res.send("Expense Tracker API Running 🚀");
+});
 // ROOT ROUTE
 app.get("/", (req, res) => {
   res.send("Expense Tracker API Running 🚀");
