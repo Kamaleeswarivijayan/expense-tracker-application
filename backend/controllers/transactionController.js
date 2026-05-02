@@ -1,48 +1,36 @@
-const User = require("../models/userModel");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const Transaction = require("../models/transactionModel");
 
-// REGISTER
-exports.register = async (req, res) => {
+// CREATE
+exports.addTransaction = async (req, res) => {
   try {
-    const hashed = await bcrypt.hash(req.body.password, 10);
-
-    const user = await User.create({
-      email: req.body.email,
-      password: hashed
-    });
-
-    res.json(user);
-
+    const data = await Transaction.create(req.body);
+    res.json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).send(err);
   }
 };
 
-// LOGIN
-exports.login = async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
+// READ
+exports.getTransactions = async (req, res) => {
+  const data = await Transaction.find();
+  res.json(data);
+};
 
-    if (!user)
-      return res.status(400).json({ message: "User not found" });
+// DELETE
+exports.deleteTransaction = async (req, res) => {
+  await Transaction.findByIdAndDelete(req.params.id);
+  res.send("Deleted");
+};
 
-    const match = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-
-    if (!match)
-      return res.status(400).json({ message: "Wrong password" });
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET || "secretkey"
-    );
-
-    res.json({ token });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// SUMMARY (IMPORTANT 💯)
+exports.getSummary = async (req, res) => {
+  const data = await Transaction.aggregate([
+    {
+      $group: {
+        _id: "$type",
+        total: { $sum: "$amount" }
+      }
+    }
+  ]);
+  res.json(data);
 };
